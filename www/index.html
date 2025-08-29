@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Obligatorio</title>
+
+        <!-- Ionic lib -->
+        <script type="module" src="https://unpkg.com/@ionic/core@next/dist/ionic/ionic.esm.js"></script>
+        <!-- Ionic lib fallback for older browsers -->
+        <script nomodule src="https://unpkg.com/@ionic/core@next/dist/ionic/ionic.js"></script>
+            <!-- Ionic Styles-->
+        <link rel="stylesheet" href="https://unpkg.com/@ionic/core@latest/css/ionic.bundle.css"/>
+         
+        <!-- mapa -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin=""/>
+       
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+        <!-- nuestra hoja de estilos -->
+        <link rel="stylesheet" href="./styles.css">
+    </head>
+    <body>
+        <ion-app>
+            <!-- navegación de la app -->
+            <ion-router>
+                <ion-route url="/" component="pagina-registro"></ion-route>
+                <ion-route url="/registro" component="pagina-registro"></ion-route>
+                <ion-route url="/login" component="pagina-ingresar"></ion-route>
+                <ion-route url="/distancia-ciudades" component="pagina-distancia-ciudades"></ion-route>
+                <ion-route url="/agregar-envio" component="pagina-agregar-envio"></ion-route>
+                <ion-route url="/listado-envios" component="pagina-listado-envios"></ion-route>
+                <ion-route url="/detalle-envio" component="pagina-detalle-envio"></ion-route>
+                <ion-route url="/gastos" component="pagina-gastos"></ion-route>
+                <ion-route url="/top" component="pagina-top"></ion-route>
+                <ion-route url="/ciudad-mas-cercana" component="pagina-ciudad-mas-cercana"></ion-route>
+                <ion-route url="/estadisticas" component="pagina-estadisticas"></ion-route>
+            </ion-router>
+            <ion-nav></ion-nav>
+
+            <!-- Menú lateral -->
+            <ion-menu side="start" content-id="main-content">
+                <ion-header>
+                  <ion-toolbar color="primary">
+                    <ion-title>Start Menu</ion-title>
+                  </ion-toolbar>
+                </ion-header>
+                <ion-content>
+                  <ion-list>
+                    <ion-list-header>
+                        <ion-label>Envíos</ion-label>
+                    </ion-list-header>
+                    <ion-item class="item-menu" href="/agregar-envio">Agregar Envío</ion-item>
+                    <ion-item class="item-menu" href="/listado-envios">Listado de Envíos</ion-item>  
+                    <ion-item class="item-menu" href="/distancia-ciudades">Distancia 2 ciudades</ion-item>  
+                    <ion-item class="item-menu" href="/ciudad-mas-cercana">Ciudad mas cercana</ion-item>  
+                    <ion-list-header>
+                        <ion-label>Estadisticas</ion-label>
+                    </ion-list-header>  
+                    <ion-item class="item-menu" href="/gastos">Gasto total de envíos</ion-item>
+                    <ion-item class="item-menu" href="/top">Top 5 departamentos</ion-item>
+                    <ion-list-header>
+                        <ion-label>Usuario</ion-label>
+                    </ion-list-header>  
+                    <ion-item class="item-menu" id="loginItem" href="/login">Ingresar</ion-item>
+                    <ion-item class="item-menu" id="registerItem" href="/registro">Registrarse</ion-item>
+                    <ion-item class="item-menu" href="/login" id="itemCerrarSesion">Cerrar sesión</ion-item>
+                  </ion-list>
+                </ion-content>
+            </ion-menu>
+            <div id="main-content"></div>
+
+             <!-- Pagina Lista Envíos -->
+            <pagina-listado-envios class="pagina ion-page">
+                <ion-header>
+                    <ion-toolbar color="primary">
+                        <ion-buttons slot="start">
+                            <ion-menu-button></ion-menu-button>
+                        </ion-buttons>
+                      <ion-title>Pedidos</ion-title>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content>
+                    <!-- https://ionicframework.com/docs/api/list -->
+                    <ion-list id="listaEnvios" lines="inset">
+                      <ion-list-header>
+                        <ion-label>Envíos realizados</ion-label>
+                      </ion-list-header>
+                    </ion-list>
+                </ion-content>
+            </pagina-listado-envios>
+
+            <!-- Distancia ciudades -->
+            <pagina-distancia-ciudades class="pagina ion-page">
+                <ion-buttons slot="start">
+                    <ion-menu-button></ion-menu-button>
+                </ion-buttons>
+                <ion-content>
+                    <ion-item>
+                        <ion-label color="secondary" position="floating">Ciudad 1</ion-label>
+                        <ion-select id="slcCiudadUnoDis"></ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label color="secondary" position="floating">Ciudad 2</ion-label>
+                        <ion-select id="slcCiudadDosDis"></ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-button id="btnBuscarDistancias">Buscar distancias</ion-button>
+                    </ion-item>
+                    <ion-item>
+                        <p id="pDistancia"></p>
+                    </ion-item>
+                    <div id="map"></div>
+                </ion-content>
+
+                <div id="map"></div>
+            </pagina-distancia-ciudades>
+            
+            <!-- Detalle envio -->
+            <pagina-detalle-envio class="pagina ion-page">
+                <ion-header>
+                    <ion-toolbar color="primary">
+                        <ion-title>Detalle de Envío</ion-title>
+                        <ion-buttons slot="start">
+                            <ion-back-button default-href="/listado-envios" text=""></ion-back-button>
+                        </ion-buttons>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content>
+                    <ion-card>
+                        <img src="" id="localImagen" />
+                        <ion-card-header>
+                            <ion-card-subtitle id="localServicios"></ion-card-subtitle>
+                            <ion-card-title id="localNombre"></ion-card-title>
+                        </ion-card-header>
+                        <ion-card-content>
+                            <p id="pIdEnvio"></p>
+                            <hr>
+                            <p id="pOrigen"></p>
+                            <hr>
+                            <p id="pDestino"></p>
+                            <hr>
+                            <p id="pPeso"></p>
+                            <hr>
+                            <p id="paDistancia"></p>
+                            <hr>
+                            <p id="pPrecio"></p>
+                            <hr>
+
+                            <div id="map2"></div>
+
+                            <ion-button id="btnCompartir">Compartir envío</ion-button>
+                        </ion-card-content>
+                    </ion-card>
+                </ion-content>
+            </pagina-detalle-envio>
+
+            <!-- gastos totales -->
+            <pagina-gastos class="pagina ion-page">
+                <ion-header>
+                    <ion-toolbar color="primary">
+                        <ion-title>Gastos totales</ion-title>
+                        <ion-buttons slot="start">
+                            <ion-menu-button></ion-menu-button>
+                        </ion-buttons>
+                    </ion-toolbar>
+                    <ion-content>
+                        <p id="pGastosTotales"></p>
+                    </ion-content>
+                </ion-header>
+            </pagina-gastos>
+
+            <!-- Ciudad más cercana -->
+            <pagina-ciudad-mas-cercana class="pagina ion-page">
+                <ion-header>
+                    <ion-toolbar color="primary">
+                        <ion-title>Ciudad Más Cercana</ion-title>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content>
+
+                    <!-- <div id="map3"></div> -->
+                    <p id="pDistanciaCercana"></p>
+
+                </ion-content>
+            </pagina-ciudad-mas-cercana>
+
+            <!-- Top 5 -->
+            <pagina-top class="pagina ion-page">
+                <ion-header>
+                    <ion-toolbar color="primary">
+                        <ion-title>Top 5</ion-title>
+                        <ion-buttons slot="start">
+                            <ion-menu-button></ion-menu-button>
+                        </ion-buttons>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content>
+                    <ion-list id="liTop">
+                        
+                    </ion-list>
+                </ion-content>
+            </pagina-top>
+
+            <pagina-agregar-envio class="pagina ion-page">
+                <ion-header>
+                    <ion-toolbar color="primary">
+                      <ion-title>Agregar Envío</ion-title>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content>
+                    <ion-item>
+                        <ion-label color="secondary" position="floating">Origen</ion-label>
+                        <ion-select id="selectCiudadOrigen"></ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label color="secondary" position="floating">Destino</ion-label>
+                        <ion-select id="selectCiudadDestino"></ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label color="secondary" position="floating">Categoria</ion-label><ion-select id="selectCategoria">
+                        </ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label position="floating">Peso</ion-label>
+                        <ion-input id="inputPeso" type="number"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-button id="btnAgregarEnvio">Agregar Envio</ion-button>
+                    </ion-item>
+                    <div id="map"></div>
+                </ion-content>
+            </pagina-agregar-envio>
+
+             <!-- Pagina de Ingreso -->
+            <pagina-ingresar class="pagina ion-page">
+                <ion-header>
+                <ion-toolbar color="primary">
+                    <ion-buttons slot="start">
+                        <ion-menu-button></ion-menu-button>
+                    </ion-buttons>
+                    <ion-title>Ingresar</ion-title>
+                </ion-toolbar>
+                </ion-header>
+                <ion-content>
+                <ion-item>
+                    <ion-label position="floating">Usuario</ion-label>
+                    <ion-input id="usuarioLogin"></ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-label position="floating">Password</ion-label>
+                    <ion-input id="passwordLogin" type="password"></ion-input>
+                    <ion-icon name="eye-off-outline" id="mostrarPass" slot="end"></ion-icon>
+                </ion-item>
+                <ion-button style="margin: 30px 20px;" expand="block" id="btnIngresar">Ingresar</ion-button>
+                <ion-label style="margin: 0px 20px;">¿Aún no tienes cuenta? <a href="#/registro">Regístrate.</a></ion-label>
+                </ion-content>
+            </pagina-ingresar>  
+
+             <!-- html de la pagina de registro    -->
+            <pagina-registro class="pagina ion-page">
+                <!-- titulo de la pagina -->
+                <ion-header>
+                    <ion-toolbar color="primary">
+                        <ion-title>Registro</ion-title>
+                    </ion-toolbar>
+                </ion-header>
+                
+                <ion-content>
+                    <ion-item>
+                        <ion-label color="secondary" position="floating">Usuario</ion-label>
+                        <ion-input id="inputUsername"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label color="secondary" position="floating">Contraseña</ion-label>
+                        <ion-input id="inputPass" type="password"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label color="secondary" position="floating">Repetir Contraseña</ion-label>
+                        <ion-input id="inputPass2" type="password"></ion-input>
+                    </ion-item>
+                    <ion-button color="primary" id="btnRegistro" expand="block" style="margin: 20px;">Registrarse</ion-button>
+
+                    <ion-label style="margin: 20px;">¿Ya tienes cuenta? <a href="#/login">Inicia sesión</a></ion-label>
+                </ion-content>
+            </pagina-registro>
+           
+        </ion-app>
+        <script src="capacitor.js"></script>
+        <!-- <script src="your/app.js"></script> -->
+        <script src="./libreria.js"></script>
+        <script src="./app.js"></script>
+        <!-- Code injected by live-server -->
+<script type="text/javascript">
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script></body>
+</html>
